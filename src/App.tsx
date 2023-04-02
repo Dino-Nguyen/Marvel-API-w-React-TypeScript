@@ -1,25 +1,30 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useState, useEffect} from 'react';
+import './App.scss';
+import {  Route, NavLink, Routes } from 'react-router-dom';
+import {Home , Filter} from "./pages/pages"
+import {Button} from '@mui/material-next';
 
-function App() {
+
+const  App:React.FC = () => {
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='App'>
+       <header className="header">
+       <h2> Marvel API Characters</h2>
+        </header>
+      <nav>
+        <NavLink style={{textDecoration:"none"}} to="/" id='headerHome' className={({ isActive }) => (isActive ? 'active' : 'inactive')}>
+          Home
+          </NavLink>
+        <NavLink style={{textDecoration:"none"}} to="/filter" id='headerFilter' className={({ isActive }) => (isActive ? 'active' : 'inactive')}>Find your fav characters</NavLink>
+      </nav>
+     
+      <Routes>
+        <Route  path="/" element={<Home/>} />
+        <Route  path="/filter" element={<Filter/>} />
+      </Routes>
     </div>
+  
   );
 }
 
