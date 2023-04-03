@@ -16,10 +16,10 @@ import commicListModel from '../../models/comicList.model';
 
 const  Filter:React.FC = () => {
     const [text, setText] = React.useState('')
-    const [comicName, setComicName] = useState<Array<commicListModel> | undefined>([]);
+    const [comicName, setComicName] = React.useState('')
     const [comicNameSelected, setComicNameSelected] = React.useState('')
     const [character, setCharacter] = useState<Array<characterModel> | undefined>([]);
-    let characterDataArray: Array<characterModel> = [];
+    let characterDataArray: Array<characterModel> = [ ];
     let comicList: Array<commicListModel> = []
     const getCharacter = async () => {
       const res = await axios.get(
@@ -34,11 +34,19 @@ const  Filter:React.FC = () => {
               item.thumbnail.path +
               "/portrait_fantastic." +
               item.thumbnail.extension,
-             comicsArray: item.comics.items[0] 
-             
-          });
+             comicsArray: item.comics.items[0]
         });
+        });
+      const findComic = characterDataArray.find((c)=>{
         
+        let com = c.comicsArray
+       
+        if(com != "" && com !== undefined) {
+          c.comics = com.name.toString()
+          
+        }
+      })
+      
       setCharacter(characterDataArray);
     };
 
@@ -46,33 +54,43 @@ const  Filter:React.FC = () => {
     useEffect(() => {
       getCharacter();
     }, [text =='']);
-   console.log("cha",character)
+   
    
     const handleOnClick = () => {
        const findChar = character && character?.length != 0 ? character?.filter((c => c.name.toLowerCase().includes(text))) : undefined;
        setCharacter(findChar)
+       console.log("findCha",findChar)
     }
-    let comic:any = "empty"
-    const findComic = character && character.length != 0 ? character.filter((c)=>{
-     
-              // if(typeof Object.values(c.comicsArray || {})[1] !== 'undefined' && Object.values(c.comicsArray || {})[1] !== null) {
-              //   c =  Object.values(c.comicsArray)[1] 
-               
-              //   console.log("2",c.comicsArray)
-              //   console.log("2","mic")
-              // } else {
-              //     comic = "empty"
-              // }
-          
-              //  c.includes(comicNameSelected)
-    }  ) : undefined;
-    const handleChange = (event: SelectChangeEvent) => {
-      setComicNameSelected(event.target.value as string);
-      console.log(comic)
-       setCharacter(findComic)
-    };
+    
    
-    console.log("list2",comicList)
+
+    const filterByComics = () => {
+        const findComic = character && character.length != 0 ? character?.filter((c)=>{
+          if(c.comics != "" && c.comics !== undefined) {
+          return  c.comics.includes('Avengers')
+          } else {
+            return
+          }
+         }) : undefined;
+         console.log("find",findComic)
+      setCharacter(findComic)
+    }
+    const filterByComics2 = () => {
+      const findComic = character && character.length != 0 ? character?.filter((c)=>{
+        if(c.comics != "" && c.comics !== undefined) {
+        return  c.comics.includes('X-Men')
+        } else {
+          return
+        }
+       }) : undefined;
+       console.log("find",findComic)
+    setCharacter(findComic)
+  }
+   
+  const filterByComics3 = () => {
+    getCharacter();
+}
+ 
   return (
     <div >
           <div className='searchBox'>
@@ -81,6 +99,7 @@ const  Filter:React.FC = () => {
                   <input type='text' placeholder='search characters' value={text} 
                   onChange={(e) => {
                     setText(e.target.value)
+                    
                      ; 
                      }}/>
                   <button disabled={!text} onClick={handleOnClick}>Search</button>
@@ -98,10 +117,12 @@ const  Filter:React.FC = () => {
           id="demo-simple-select"
           value={comicNameSelected}
           label="comicName"
-          onChange={handleChange}
+          onChange={(e) => {setComicNameSelected(e.target.value) }}
+          
         >
-         <MenuItem value={'Avengers'} >Avengers</MenuItem>
-         <MenuItem value={'X-Men'} >X-Men</MenuItem>
+          <MenuItem value={'All'} onClick={filterByComics3} >All</MenuItem>
+         <MenuItem value={'Avengers'} onClick={filterByComics} >Avengers</MenuItem>
+         <MenuItem value={'X-Men'} onClick={filterByComics2}>X-Men</MenuItem>
         </Select>
       </FormControl>
     </Box>
@@ -111,17 +132,6 @@ const  Filter:React.FC = () => {
             <h3>Character Not Found</h3>
             }
             {character && character?.map((character, index: number) => {
-              let comic:any = "empty"
-              if(typeof Object.values(character.comicsArray || {})[1] !== 'undefined' && Object.values(character.comicsArray || {})[1] !== null) {
-                comic =  Object.values(character.comicsArray)[1] 
-                
-                comicList.push({
-                  name : comic
-                })
-            
-              } else {
-                  comic = "empty"
-              }
              
               return (
                 <Card
@@ -136,7 +146,6 @@ const  Filter:React.FC = () => {
                       component="img"
                       height="340"
                       image={character.image}
-                      alt="green iguana"
                       style={{
                         width: "300px",
                         margin: " 30px",
@@ -147,7 +156,7 @@ const  Filter:React.FC = () => {
                         {character.name}
                       </Typography>
                       <div> 
-                       {comic}
+                       {character.comics}
                       </div>
                       
                     </CardContent>
